@@ -2,6 +2,7 @@
 
 
 <div class = "container-fluid">
+    <br /><br /><br /><br />
 	<table id="myTable" class="table table-bordered table-striped table-hover table-responsive">
         <thead>
             <tr>
@@ -25,6 +26,10 @@
         $('#myTable').dataTable({
             "processing": true,
             "serverSide": true,
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
             "ajax": {
                 "url": "/Personas/FillData",
                 "type" : "POST",

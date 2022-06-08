@@ -11,13 +11,13 @@ namespace DataTableJQueryMVC.Controllers
         private readonly ApplicationDbContext _db;
 
         //datatable properties
-        public string draw = "";
-        public string start = ""; 
-        public string lenght = ""; 
-        public string sortColumn = ""; 
-        public string sortColumnDir = "";
-        public string searchValue = "";
-        public int pageSize, skip, recordsTotal;
+        //public string draw = "";
+        //public string start = ""; 
+        //public string lenght = ""; 
+        //public string sortColumn = ""; 
+        //public string sortColumnDir = "";
+        //public string searchValue = "";
+        //public int pageSize, skip, recordsTotal;
         
 
 
@@ -38,16 +38,16 @@ namespace DataTableJQueryMVC.Controllers
             try
             {
                 //valores que regresa el datatable
-                draw = Request.Form["draw"];
-                start = Request.Form["start"];
-                lenght = Request.Form["length"];
-                sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"] + "][name]"];
-                sortColumnDir = Request.Form["order[0][dir]"];
-                searchValue = Request.Form["search[value]"];
+                string draw = Request.Form["draw"];
+                string start = Request.Form["start"];
+                string lenght = Request.Form["length"];
+                string sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"] + "][name]"];
+                string sortColumnDir = Request.Form["order[0][dir]"];
+                string searchValue = Request.Form["search[value]"];
 
-                pageSize = lenght != null ? Convert.ToInt32(lenght) : 0;
-                skip = start != null ? Convert.ToInt32(start) : 0;
-                recordsTotal = 0;
+                int pageSize = lenght != null ? Convert.ToInt32(lenght) : 0;
+                int skip = start != null ? Convert.ToInt32(start) : 0;
+                int recordsTotal = 0;
                 
                 IQueryable<Models.Personas> query = _db.Personas;
 
