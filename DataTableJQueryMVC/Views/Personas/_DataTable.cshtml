@@ -1,0 +1,48 @@
+﻿<table id="myTable" class="table table-bordered table-striped table-hover table-responsive">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Edad</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+    <tfoot>
+    </tfoot>
+</table>
+
+@section scripts
+{
+<script>
+    $(document).ready(function () {
+        $('#myTable').dataTable({
+            "processing": true,
+            "serverSide": true,
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ],
+            "ajax": {
+                "url": "/Personas/FillData",
+                "type": "POST",
+                "datatype": "json"
+            },
+            "pageLenght": 10,
+            "filter": true,
+            "responsivePriority": 1,
+            "data": null,
+            "columns": [
+                { "data": "id", "name": "id", "autoWidth": true },
+                { "data": "nombre", "name": "nombre", "autoWidth": true },
+                { "data": "edad", "name": "edad", "autoWidth": true }
+            ]
+
+        });
+    });
+
+
+
+</script>
+}
+
