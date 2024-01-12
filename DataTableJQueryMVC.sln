@@ -5,22 +5,27 @@ VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataTableJQueryMVC", "DataTableJQueryMVC\DataTableJQueryMVC.csproj", "{FB7DE49A-28CC-47AA-82F6-54615A1D3D7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JQueryDataTablesMVC", "JQueryDataTablesMVC\JQueryDataTablesMVC.csproj", "{D388F524-5BD2-443F-B7DB-510B8440FB13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JQueryDataTablesMVC", "JQueryDataTablesMVC\JQueryDataTablesMVC.csproj", "{D388F524-5BD2-443F-B7DB-510B8440FB13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Test|Any CPU = Test|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FB7DE49A-28CC-47AA-82F6-54615A1D3D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB7DE49A-28CC-47AA-82F6-54615A1D3D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB7DE49A-28CC-47AA-82F6-54615A1D3D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FB7DE49A-28CC-47AA-82F6-54615A1D3D7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB7DE49A-28CC-47AA-82F6-54615A1D3D7C}.Test|Any CPU.ActiveCfg = Test|Any CPU
+		{FB7DE49A-28CC-47AA-82F6-54615A1D3D7C}.Test|Any CPU.Build.0 = Test|Any CPU
 		{D388F524-5BD2-443F-B7DB-510B8440FB13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D388F524-5BD2-443F-B7DB-510B8440FB13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D388F524-5BD2-443F-B7DB-510B8440FB13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D388F524-5BD2-443F-B7DB-510B8440FB13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D388F524-5BD2-443F-B7DB-510B8440FB13}.Test|Any CPU.ActiveCfg = Test|Any CPU
+		{D388F524-5BD2-443F-B7DB-510B8440FB13}.Test|Any CPU.Build.0 = Test|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

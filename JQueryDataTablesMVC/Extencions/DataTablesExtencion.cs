@@ -2,24 +2,33 @@
 using JQueryDataTablesMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Dynamic.Core; // se debe instalar esta extension para que funcione IQueryable 
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
+using System.Reflection; // se debe instalar esta extension para que funcione IQueryable 
 
 namespace JQueryDataTablesMVC.Extencions
 {
-    public abstract class DataTablesExtencion : Controller
+    public abstract class DataTablesExtencion<T> : Controller where T : class
     {
+        #region Properties
         private readonly ApplicationDbContext _db;
+        #endregion
 
+        #region Constructor
         public DataTablesExtencion(ApplicationDbContext db)
         {
             _db = db;
         }
+        #endregion
 
+        #region FillData
         [HttpPost]
-        public async Task<ActionResult> FillData()
+        public async Task<ActionResult> FillDataAsync()
         {
             try
             {
+                //var entity = await _db.Set<T>().ToArrayAsync();
+
                 //valores que regresa el datatable
                 string draw = Request.Form["draw"];
                 string start = Request.Form["start"];
@@ -32,11 +41,11 @@ namespace JQueryDataTablesMVC.Extencions
                 int skip = start != null ? Convert.ToInt32(start) : 0;
                 int recordsTotal = 0;
 
-                IQueryable<Personas> query = _db.Personas;
+                IQueryable<T> query = _db.Set<T>();
 
                 if (searchValue != "")
                 {
-                    query = query.Where(x => x.Nombre.Contains(searchValue));
+                    query = ApplySearchFilter(query, searchValue);
                 }
 
                 if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDir))
@@ -59,6 +68,68 @@ namespace JQueryDataTablesMVC.Extencions
             {
                 return Json(ex);
             }
+        } 
+        #endregion
+
+        private IQueryable<T> ApplySearchFilter(IQueryable<T> query, string searchValue)
+        {
+            var properties = typeof(T).GetProperties();
+
+            var parameter = Expression.Parameter(typeof(T));
+            Expression finalExpression = null;
+
+            foreach (var property in properties)
+            {
+                var propertyType = property.PropertyType;
+
+                if (propertyType == typeof(string))
+                {
+                    var propertyAccess = Expression.Property(parameter, property);
+                    var toStringMethod = propertyType.GetMethod("ToString", Type.EmptyTypes);
+                    var toStringExpression = Expression.Call(propertyAccess, toStringMethod);
+
+                    var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                    var filterExpression = Expression.Call(toStringExpression, containsMethod, Expression.Constant(searchValue));
+
+                    if (finalExpression == null)
+                        finalExpression = filterExpression;
+                    else
+                        finalExpression = Expression.Or(finalExpression, filterExpression);
+                }
+                else if (propertyType.IsValueType || Nullable.GetUnderlyingType(propertyType) != null)
+                {
+                    var filterExpression = BuildValueFilterExpression(parameter, property, searchValue);
+
+                    if (finalExpression == null)
+                        finalExpression = filterExpression;
+                    else
+                        finalExpression = Expression.Or(finalExpression, filterExpression);
+                }
+            }
+
+            if (finalExpression != null)
+            {
+                var lambda = Expression.Lambda<Func<T, bool>>(finalExpression, parameter);
+                query = query.Where(lambda);
+            }
+
+            return query;
         }
+
+        private Expression BuildValueFilterExpression(ParameterExpression parameter, PropertyInfo property, string searchValue)
+        {
+            var propertyAccess = Expression.Property(parameter, property);
+            var toStringMethod = property.PropertyType.GetMethod("ToString", Type.EmptyTypes);
+            var toStringExpression = Expression.Call(propertyAccess, toStringMethod);
+
+            var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+            var filterExpression = Expression.Call(toStringExpression, containsMethod, Expression.Constant(searchValue));
+
+            return filterExpression;
+        }
+
+
+
+
     }
 }

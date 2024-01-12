@@ -9,7 +9,6 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/datatable/datatables.min.js"></script>
 
-
 <table id="myTable" class="table table-bordered table-striped table-hover table-responsive">
     <thead>
         <tr>
@@ -26,48 +25,30 @@
     </tfoot>
 </table>
 
-   
 <script>
+    //#region Variables
     let url = '@Model.Url';
     // Obtener el tipo de entidad desde el modelo de la vista
-    var entityType = '@Model.Entity != null ? Type.GetType("JQueryDataTablesMVC.Models." + Model.Entity.GetType().Name) : null;';
-
-    // Crear una función que devuelva la información de las propiedades de la entidad
-    function obtenerPropiedades(entidad) {
-        var propiedades = [];
-
-        for (var propiedad in entidad) {
-            if (entidad.hasOwnProperty(propiedad)) {
-                propiedades.push({
-                    data: propiedad,
-                    name: propiedad,
-                    autoWidth: true
-                });
-            }
-        }
-
-        return propiedades;
-    }
+    var entityType = '@Model.Entity != null ? Type.GetType("JQueryDataTablesMVC.Models." + Model.Entity.GetType().Name) : null;';   
+    //#endregion    
 
     // Crear un objeto de configuración para las columnas de DataTable
     var columnas = [
         {
             data: null,
             render: function (data, type, row) {
-                return '<button onclick="editRow(' + row.id + ')">Editar</button>';
+                var _row = encodeURIComponent(JSON.stringify(row));
+                console.log(_row);
+                return `<button onclick="editRow('${_row}')">Editar</button>`;
             }
         }
     ];
 
     // Agregar las propiedades de la entidad como columnas
-    columnas.push(...@Html.Raw(Json.Serialize(properties.Select(prop => new
-        {
-            data = prop.Name,
-            name = prop.Name,
-            autoWidth = true
-        }))));
-
-    console.log(columnas);
+    @foreach (var prop in properties)
+    {       
+        <text>columnas.push({ data: '@prop.Name.ToLower()', name: '@prop.Name.ToLower()', autoWidth: true });</text>
+    }    
 
     $(document).ready(function () {
         $('#myTable').dataTable({
@@ -88,25 +69,16 @@
             "responsivePriority": 1,
             "data": null,
             "columns": columnas
-            // [
-            //     {
-            //         "data": null,
-            //         "render": function (data, type, row) {
-            //             return '<button onclick="editRow(' + row.id + ')">Editar</button>';
-            //         }
-            //     },
-            //     { "data": "id", "name": "id", "autoWidth": true },
-            //     { "data": "nombre", "name": "nombre", "autoWidth": true },
-            //     { "data": "edad", "name": "edad", "autoWidth": true }
-            // ]
+            
 
         });
     });
     
     // editar row
-    function editRow(row) {
-        
-        alert(row);
+    function editRow(encodedRow) {
+
+        var decodedRow = JSON.parse(decodeURIComponent(encodedRow));
+        alert(JSON.stringify(decodedRow));
     }
 
     

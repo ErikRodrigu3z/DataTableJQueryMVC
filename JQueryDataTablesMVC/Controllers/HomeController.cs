@@ -6,14 +6,13 @@ using System.Diagnostics;
 
 namespace JQueryDataTablesMVC.Controllers
 {
-    public class HomeController : DataTablesExtencion
+    public class HomeController : DataTablesExtencion<Personas>
     {
         private readonly ILogger<HomeController> _logger;       
 
         public HomeController(ILogger<HomeController> logger, ApplicationDbContext db) : base(db)
         {
-            _logger = logger;
-            
+            _logger = logger;            
         }
 
         public IActionResult Index()
