@@ -28,6 +28,8 @@
 <script>
     //#region Variables
     let url = '@Model.Url';
+    let stateSave = @Model.StateSave.ToString().ToLower();
+    let pageLenght = @Model.PageLenght;
     // Obtener el tipo de entidad desde el modelo de la vista
     var entityType = '@Model.Entity != null ? Type.GetType("JQueryDataTablesMVC.Models." + Model.Entity.GetType().Name) : null;';   
     //#endregion    
@@ -37,9 +39,8 @@
         {
             data: null,
             render: function (data, type, row) {
-                var _row = encodeURIComponent(JSON.stringify(row));
-                console.log(_row);
-                return `<button onclick="editRow('${_row}')">Editar</button>`;
+                var _row = encodeURIComponent(JSON.stringify(row));                
+                return `<button type="button" class="btn btn-primary" onclick="editRow('${_row}')"><i class="bi bi-pencil"></i> Editar</button>`;
             }
         }
     ];
@@ -48,13 +49,14 @@
     @foreach (var prop in properties)
     {       
         <text>columnas.push({ data: '@prop.Name.ToLower()', name: '@prop.Name.ToLower()', autoWidth: true });</text>
-    }    
+    }   
 
     $(document).ready(function () {
         $('#myTable').dataTable({
             "processing": true,
             "serverSide": true,
             dom: 'Bfrtip',
+            stateSave: stateSave,
             buttons: [
                 'copy', 'csv', 'excel', 'pdf', 'print'
             ],

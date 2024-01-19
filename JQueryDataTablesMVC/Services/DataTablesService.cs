@@ -1,21 +1,20 @@
 ﻿using JQueryDataTablesMVC.Data;
-using JQueryDataTablesMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Dynamic.Core; // se debe instalar esta extension para que funcione IQueryable 
 using System.Linq.Expressions;
-using System.Reflection; 
+using System.Reflection;
+using System.Linq.Dynamic.Core; // se debe instalar esta extension para que funcione IQueryable  
 
-namespace JQueryDataTablesMVC.Extencions
+namespace JQueryDataTablesMVC.Services
 {
-    public abstract class DataTablesExtencion<T> : Controller where T : class
+    public class DataTablesService<T> : Controller where T : class
     {
         #region Properties
         private readonly ApplicationDbContext _db;
         #endregion
 
         #region Constructor
-        public DataTablesExtencion(ApplicationDbContext db)
+        public DataTablesService(ApplicationDbContext db)
         {
             _db = db;
         }
@@ -68,7 +67,7 @@ namespace JQueryDataTablesMVC.Extencions
             {
                 return Json(ex);
             }
-        } 
+        }
         #endregion
 
         private IQueryable<T> ApplySearchFilter(IQueryable<T> query, string searchValue)
@@ -127,8 +126,6 @@ namespace JQueryDataTablesMVC.Extencions
 
             return filterExpression;
         }
-
-
 
 
     }
