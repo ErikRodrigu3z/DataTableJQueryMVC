@@ -11,7 +11,7 @@ namespace JQueryDataTablesMVC.Controllers
         private readonly ILogger<HomeController> _logger;       
 
         public HomeController(ILogger<HomeController> logger, ApplicationDbContext db) : base(db)
-        {
+        {            
             _logger = logger;            
         }
 

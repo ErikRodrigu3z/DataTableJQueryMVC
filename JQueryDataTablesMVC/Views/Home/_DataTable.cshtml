@@ -9,21 +9,50 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/datatable/datatables.min.js"></script>
 
-<table id="myTable" class="table table-bordered table-striped table-hover table-responsive">
-    <thead>
-        <tr>
-            <th></th>
-            @foreach (var prop in entityType.GetProperties())
-            {
-                <th>@prop.Name</th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-    <tfoot>
-    </tfoot>
-</table>
+<!-- table -->
+<div class="">
+    <table id="myTable" class="table table-bordered table-striped table-hover table-responsive">
+        <thead>
+            <tr>
+                <th></th>
+                @foreach (var prop in entityType.GetProperties())
+                {
+                    <th>@prop.Name</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+        <tfoot>
+        </tfoot>
+    </table>
+</div>
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="edit-form" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #009688; color:white">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid card">
+                    <form id="form-edit" >
+
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     //#region Variables
@@ -34,27 +63,40 @@
     var entityType = '@Model.Entity != null ? Type.GetType("JQueryDataTablesMVC.Models." + Model.Entity.GetType().Name) : null;';   
     //#endregion    
 
-    // Crear un objeto de configuración para las columnas de DataTable
+    //#region Crear un objeto de configuración para las columnas de DataTable
     var columnas = [
         {
             data: null,
             render: function (data, type, row) {
                 var _row = encodeURIComponent(JSON.stringify(row));                
-                return `<button type="button" class="btn btn-primary" onclick="editRow('${_row}')"><i class="bi bi-pencil"></i> Editar</button>`;
+                return `<button type="button" class="btn btn-primary" onclick="editRow('${_row}')" data-bs-toggle="modal" data-bs-target="#edit-form"><i class="bi bi-pencil"></i> Editar</button>`;
             }
         }
     ];
+    //#endregion
 
-    // Agregar las propiedades de la entidad como columnas
+    //#region Agregar las propiedades de la entidad como columnas
     @foreach (var prop in properties)
     {       
         <text>columnas.push({ data: '@prop.Name.ToLower()', name: '@prop.Name.ToLower()', autoWidth: true });</text>
-    }   
+    }
+    //#endregion
 
+    //#region document.ready
     $(document).ready(function () {
+        // Setup - add a text input to each footer cell
+        $('#myTable thead tr').clone(true).addClass('filters').appendTo('#myTable thead');
+
+
         $('#myTable').dataTable({
             "processing": true,
             "serverSide": true,
+            "orderCellsTop": true,
+            "responsive": true,
+            fixedHeader: {
+                header: true,
+                footer: true
+            },
             dom: 'Bfrtip',
             stateSave: stateSave,
             buttons: [
@@ -68,24 +110,96 @@
             },
             "pageLenght": 10,
             "filter": true,
-            "responsivePriority": 1,
+            //"responsivePriority": 1,
             "data": null,
-            "columns": columnas
-            
+            "columns": columnas,           
+
+            //filter columns
+            initComplete: function () {
+                var api = this.api();
+                // For each column
+                api.columns().eq(0).each(function (colIdx) {
+                    // Set the header cell to contain the input element
+                    var cell = $('.filters th').eq($(api.column(colIdx).header()).index());
+                    var title = $(cell).text();
+                    $(cell).html('<input type="text" id="' + title + '" placeholder="' + title + '" />');
+                    // On every keypress in this input
+                    $('input', $('.filters th').eq($(api.column(colIdx).header()).index()))
+                        .off('keyup change')
+                        .on('keyup change', function (e) {
+                            e.stopPropagation();
+                            // Get the search value
+                            $(this).attr('title', $(this).val());
+                            var regexr = '({search})'; //$(this).parents('th').find('select').val();
+                            var cursorPosition = this.selectionStart;
+                            // Search the column for that value
+                            api
+                                .column(colIdx)
+                                .search((this.value != "") ? regexr.replace('{search}', '(((' + this.value + ')))') : "", this.value != "", this.value == "")
+                                .draw();
+                            $(this).focus()[0].setSelectionRange(cursorPosition, cursorPosition);
+                        });
+                });
+            }
+
+
 
         });
     });
-    
-    // editar row
+    //#endregion
+
+    //#region editar row
     function editRow(encodedRow) {
-
+        var modal = document.getElementById('edit-form');
         var decodedRow = JSON.parse(decodeURIComponent(encodedRow));
-        alert(JSON.stringify(decodedRow));
+        
+        // Obtén el contenedor donde se generará el formulario
+        var formularioContainer = document.getElementById('form-edit');
+
+        // Limpia el contenedor antes de agregar el nuevo formulario
+        formularioContainer.innerHTML = '';
+
+        // Crea un formulario
+        var formulario = document.createElement('form');
+        formulario.classList.add('needs-validation');
+
+
+        // Itera sobre las propiedades de la fila
+        for (var propiedad in decodedRow) {
+            if (decodedRow.hasOwnProperty(propiedad)) {
+                // Crea un grupo de formulario con clase Bootstrap
+                var formGroup = document.createElement('div');
+                formGroup.classList.add('mb-3');
+
+                // Crea una etiqueta con clase Bootstrap
+                var label = document.createElement('label');
+                label.classList.add('form-label');
+                label.innerHTML = propiedad;
+
+                // Crea un campo de entrada con clase Bootstrap
+                var input = document.createElement('input');
+                input.type = 'text';
+                input.classList.add('form-control');
+                input.name = propiedad;
+                input.value = decodedRow[propiedad];
+
+                // Agrega la etiqueta y el campo de entrada al grupo de formulario
+                formGroup.appendChild(label);
+                formGroup.appendChild(input);
+
+                // Agrega el grupo de formulario al formulario
+                formulario.appendChild(formGroup);
+            }
+        }
+
+        // Agrega el formulario al contenedor
+        formularioContainer.appendChild(formulario);
+
+
+
+
     }
-
-    
-
-
+    //#endregion
 </script>
 
 

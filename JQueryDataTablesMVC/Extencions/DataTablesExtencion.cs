@@ -2,6 +2,7 @@
 using JQueryDataTablesMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using System.Linq.Dynamic.Core; // se debe instalar esta extension para que funcione IQueryable 
 using System.Linq.Expressions;
 using System.Reflection; 
@@ -27,15 +28,16 @@ namespace JQueryDataTablesMVC.Extencions
         {
             try
             {
-                //var entity = await _db.Set<T>().ToArrayAsync();
-
                 //valores que regresa el datatable
                 string draw = Request.Form["draw"];
+                string id = Request.Form["Id"];
                 string start = Request.Form["start"];
                 string lenght = Request.Form["length"];
                 string sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"] + "][name]"];
                 string sortColumnDir = Request.Form["order[0][dir]"];
                 string searchValue = Request.Form["search[value]"];
+                
+                string searchValue2 = Request.Form["columns[2][search][value]"];
 
                 int pageSize = lenght != null ? Convert.ToInt32(lenght) : 0;
                 int skip = start != null ? Convert.ToInt32(start) : 0;
